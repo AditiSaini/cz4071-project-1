@@ -9,12 +9,14 @@ March 13, 2018; 5 PM
   - Using Python to convert
 3) Write a program to read in the nodes and edges
   - Power law
-  - Possein distribution
-  - Betweeness
-  - Closeness
-  - High/Low
-  - Degree distribution
+  - Possion distribution
+  - High/Low Betweeness
+  - High/Low Closeness
+  - High/Low Degree [Jia Jun]
+  - Degree distribution [Jia Jun]
   - Compare between Random network and scale free networks
+      - Random Network [Jia Jun] 
+      - Scale Free Networks 
 4) Generate UI
   - Browser based
 5) (Optional) Consider networks from http://snap.stanford.edu/data/index.html
