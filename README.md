@@ -13,7 +13,7 @@ March 13, 2018; 5 PM
   - High/Low Betweeness
   - High/Low Closeness
   - High/Low Degree [Jia Jun]
-  - Degree distribution [Jia Jun]
+  - Degree distribution 
   - Compare between Random network and scale free networks
       - Random Network [Jia Jun] 
       - Scale Free Networks 
