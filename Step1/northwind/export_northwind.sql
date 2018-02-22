@@ -1,0 +1,6 @@
+COPY (SELECT * FROM customers) TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/customers.csv' WITH CSV header;
+COPY (SELECT * FROM suppliers) TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/suppliers.csv' WITH CSV header;
+COPY (SELECT * FROM products)  TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/products.csv' WITH CSV header;
+COPY (SELECT * FROM employees) TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/employees.csv' WITH CSV header;
+COPY (SELECT * FROM categories) TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/categories.csv' WITH CSV header;
+COPY (SELECT * FROM orders LEFT OUTER JOIN order_details ON orders."OrderID" = order_details."OrderID") TO '/Users/junxiang/Documents/NTU 1718 Sem 2/CZ4071_NS_Data/cz4071-project-1/Step1/northwind/orders.csv' WITH CSV header;
