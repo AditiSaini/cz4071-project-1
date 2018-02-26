@@ -47,7 +47,7 @@ DROP TABLE data_part;
 select * into data_lineitem from lineitem limit :items offset :item_offset;
 select * into data_orders from orders where o_orderkey in (select distinct l_orderkey from data_lineitem);
 select * into data_customer from customer where c_custkey in (select distinct o_custkey from data_orders);
-select partsupp.* into data_partsupp from partsupp join lineitem on l_partkey = ps_partkey and l_suppkey = ps_suppkey WHERE l_orderkey in (select distinct l_orderkey from data_lineitem);
+select partsupp.* into data_partsupp from partsupp join data_lineitem on l_partkey = ps_partkey and l_suppkey = ps_suppkey WHERE l_orderkey in (select distinct l_orderkey from data_lineitem);
 select * into data_part from part where p_partkey in (select distinct ps_partkey from data_partsupp);
 select * into data_supplier from supplier where s_suppkey in (select distinct ps_suppkey from data_partsupp);
 select * into data_nations from nation where n_nationkey in (select distinct c_nationkey from data_customer union all select distinct s_nationkey from data_supplier);
