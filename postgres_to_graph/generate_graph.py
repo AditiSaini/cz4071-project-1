@@ -151,30 +151,32 @@ for i in G.nodes:
     raw_file.write(' '.join([str(q[1]) for q in G.edges(i)]) + '\n')
 raw_file.close()
 
-# # Graph plotting
-# import matplotlib.pyplot as plt
+# Only plot if 3 args are available
+if len(sys.argv) == 3:
+    # Graph plotting
+    import matplotlib.pyplot as plt
 
-# Create color map
-color_map = {
-    'region': '#e6194b', # red
-    'nation': '#3cb44b', # green
-    'supplier': '#ffe119', # yellow
-    'customer': '#0082c8', # blue
-    'order': '#f58231', # orange
-    'lineitem': '#911eb4', # purple
-    'part': '#46f0f0', # cyan
-    'partsupp': '#f032e6', # magenta
-    'lineitem': '#fabebe'  # pink
-}
+    # Create color map
+    color_map = {
+        'region': '#e6194b', # red
+        'nation': '#3cb44b', # green
+        'supplier': '#ffe119', # yellow
+        'customer': '#0082c8', # blue
+        'order': '#f58231', # orange
+        'lineitem': '#911eb4', # purple
+        'part': '#46f0f0', # cyan
+        'partsupp': '#f032e6', # magenta
+        'lineitem': '#fabebe'  # pink
+    }
 
-# Create labels
-labels = {}
-for table_key in nodes:
-    for prim_key in nodes[table_key]:
-        labels[nodes[table_key][prim_key]['node_id']] = nodes[table_key][prim_key]['data']['name']
+    # Create labels
+    labels = {}
+    for table_key in nodes:
+        for prim_key in nodes[table_key]:
+            labels[nodes[table_key][prim_key]['node_id']] = nodes[table_key][prim_key]['data']['name']
 
-pos = nx.spring_layout(G, scale=2)
-## construct a list of colors then pass to node_color
-nx.draw(G, labels=labels, node_color=[color_map[G.node[node]['table']] for node in G])
-# nx.draw(G, node_color=[color_map[G.node[node]['table']] for node in G])
-plt.show()
+    pos = nx.spring_layout(G, scale=2)
+    ## construct a list of colors then pass to node_color
+    nx.draw(G, labels=labels, node_color=[color_map[G.node[node]['table']] for node in G])
+    # nx.draw(G, node_color=[color_map[G.node[node]['table']] for node in G])
+    plt.show()
