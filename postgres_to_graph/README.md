@@ -11,3 +11,6 @@
 
 # TODO
 - Currently, LineItem and PartSupp are set as nodes. They shouldn't be. 
+
+# Database Diagram
+![db](https://docs.snowflake.net/manuals/_images/sample-data-tpch-schema.png)
