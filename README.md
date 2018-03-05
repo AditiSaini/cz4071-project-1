@@ -7,18 +7,20 @@ March 13, 2018; 5 PM
 1) From TPC -> Write import statement into Postgres
 2) Using Postgres data, generate Nodes and Edges
   - Using Python to convert
-3) Write a program to read in the nodes and edges
-  - Power law
-  - Possion distribution
-  - High/Low Betweeness
-  - High/Low Closeness
-  - High/Low Degree [Jia Jun]
-  - Degree distribution 
-  - Compare between Random network and scale free networks
-      - Random Network [Jia Jun] 
-      - Scale Free Networks 
-4) Generate UI
-  - Browser based
+3) Analyze graph properties
+  - [x] Average path length
+  - [x] Betweenness centrality
+  - [x] Closeness centrality
+  - [ ] Degree distribution
+  - [ ] Maximum degree
+  - [ ] Degree correlation
+  - [ ] Degree centrality
+  - [ ] Clustering coefficient
+  - [ ] N-th moment
+4) Compare with random network and scale free networks
+  - Random Network [Jia Jun] 
+  - Scale Free Networks 
+4) Generate UI (Python Tkinter)
 5) (Optional) Consider networks from http://snap.stanford.edu/data/index.html
 
 ## TPC-H Steps
