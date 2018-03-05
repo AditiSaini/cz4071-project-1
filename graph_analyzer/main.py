@@ -10,4 +10,6 @@ if __name__ == "__main__":
     print("|E|: " + str(graph.get_edge_count()))
     print("Neighbor of vertex 0: " + str(graph.neighbor_of(0)))
     analyzer.compute_betweenness_centrality([])
-    print(len(analyzer.bc_values))
+    print("Betweenness: " + str(len(analyzer.bc_values)))
+    analyzer.compute_degree_correlation()
+    print("Degree correlation: " + str(analyzer.knn))

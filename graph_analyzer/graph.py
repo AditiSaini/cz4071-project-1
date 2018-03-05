@@ -11,12 +11,14 @@ class Graph:
         """
         if self.loaded:
             return
-        self.vertices = []
-        self.edges = []
+        self.vertices = [] # the accumulated number of neighbors for vertices
+        self.edges = [] # neighbors for each vertex
+        self.degrees = [] # the degree for each vertex
         with open(self.graph_file, "r") as input_graph:
             for line in input_graph:
                 self.vertices.append(len(self.edges))
                 destinations = line.split(" ")
+                self.degrees.append(len(destinations))
                 for destination in destinations:
                     self.edges.append(int(destination))
         self.vertices.append(len(self.edges))
@@ -38,3 +40,6 @@ class Graph:
 
     def get_edge_count(self):
         return self.edge_count
+    
+    def get_degrees(self):
+        return self.degrees
