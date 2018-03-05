@@ -8,42 +8,69 @@ class GraphAnalyzer:
     def compute_average_degree(self):
         return self.graph.get_edge_count() / self.graph.get_vertex_count()
 
-    def compute_betweenness_centrality(self, sources):
+    def compute_sssp_related_properties(self, sources):
+        """
+        Computes SSSP based properties including average path length,
+        betweenness centrality, and closeness centrality.
+        """
+        # initialization
+        if not hasattr(self, "bc_values"):
+            self.bc_values = [0.0 for i in self.graph.get_vertices()]
+        if not hasattr(self, "total_path_length"):
+            self.total_path_length = 0
+        if not hasattr(self, "total_path_count"):
+            self.total_path_count = 0
+        if not hasattr(self, "close_values"):
+            self.close_values = [0.0 for i in self.graph.get_vertices()]
+        # set the list of source vertex
+        if len(sources) == 0:
+            sources = self.graph.get_vertices()
+        # run
+        for source in sources:
+            self.compute_for_single_source(source)
+        self.avg_path_length = self.total_path_length / self.total_path_count
+
+    def compute_for_single_source(self, source):
         """
         Compute between-ness centrality
         """
-        if not hasattr(self, "bc_values"):
-            self.bc_values = [0.0 for i in self.graph.get_vertices()]
+        # initialization
+        dependencies = [0.0 for i in self.graph.get_vertices()]
+        distances = [1000000000 for i in self.graph.get_vertices()]
+        sigma = [0 for i in self.graph.get_vertices()]
+        predecessors = [[] for i in self.graph.get_vertices()]
+        q = deque()
+        s = []
+        # run BFS
+        distances[source] = 0
+        q.append(source)
+        while len(q) != 0:
+            v = q.popleft()
+            s.append(v)
+            for w in self.graph.neighbor_of(v):
+                if distances[w] == 1000000000:
+                    distances[w] = distances[v] + 1
+                    q.append(w)
+                if distances[w] == distances[v] + 1:
+                    sigma[w] += 1
+                    predecessors[w].append(v)
         # compute BC
-        if len(sources) == 0:
-            sources = self.graph.get_vertices()
-        for source in sources:
-            # initialization
-            dependencies = [0.0 for i in self.graph.get_vertices()]
-            distances = [1000000000 for i in self.graph.get_vertices()]
-            sigma = [0 for i in self.graph.get_vertices()]
-            predecessors = [[] for i in self.graph.get_vertices()]
-            q = deque()
-            s = []
-            # update source
-            distances[source] = 0
-            q.append(source)
-            while len(q) != 0:
-                v = q.popleft()
-                s.append(v)
-                for w in self.graph.neighbor_of(v):
-                    if distances[w] == 1000000000:
-                        distances[w] = distances[v] + 1
-                        q.append(w)
-                    if distances[w] == distances[v] + 1:
-                        sigma[w] += 1
-                        predecessors[w].append(v)
-            while len(s) != 0:
-                v = s.pop()
-                for predecessor in predecessors[v]:
-                    dependencies[predecessor] += (sigma[predecessor] / sigma[v]) * (1.0 + dependencies[v])
-                if v != source:
-                    self.bc_values[v] += dependencies[v]
+        while len(s) != 0:
+            v = s.pop()
+            for predecessor in predecessors[v]:
+                dependencies[predecessor] += (sigma[predecessor] / sigma[v]) * (1.0 + dependencies[v])
+            if v != source:
+                self.bc_values[v] += dependencies[v]
+        # compute closeness and average path length
+        total_length_from_source = 0
+        total_path_count_from_source = 0
+        for dist in distances:
+            if dist != 1000000000 and dist != 0:
+                total_length_from_source += dist
+                total_path_count_from_source += 1
+                self.total_path_length += dist
+                self.total_path_count += 1
+        self.close_values[source] = total_length_from_source / total_path_count_from_source
 
     def degree_distribution(self):
         ''' get the graph degree distribution '''
