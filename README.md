@@ -11,12 +11,12 @@ March 13, 2018; 5 PM
   - [x] Average path length
   - [x] Betweenness centrality
   - [x] Closeness centrality
-  - [ ] Degree distribution
-  - [ ] Maximum degree
-  - [ ] Degree correlation
+  - [x] Degree distribution
+  - [x] Maximum degree
+  - [x] Degree correlation
   - [ ] Degree centrality
-  - [ ] Clustering coefficient
-  - [ ] N-th moment
+  - [x] Clustering coefficient - local & average
+  - [x] N-th moment
 4) Compare with random network and scale free networks
   - Random Network [Jia Jun] 
   - Scale Free Networks 
