@@ -14,7 +14,7 @@ March 13, 2018; 5 PM
   - [x] Degree distribution
   - [x] Maximum degree
   - [x] Degree correlation
-  - [ ] Degree centrality
+  - [x] Degree centrality
   - [x] Clustering coefficient - local & average
   - [x] N-th moment
 4) Compare with random network and scale free networks
