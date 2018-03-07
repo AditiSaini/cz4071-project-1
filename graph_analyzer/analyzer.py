@@ -89,43 +89,26 @@ class GraphAnalyzer:
         self.degree_prob_distribution = distribution
         return distribution
 
-    def compute_edge_prob_distribution(self):
-        distribution = {}
-        degrees = self.graph.get_degrees()
-        for v in range(self.graph.get_vertex_count()):
-            source_degree = degrees[v]
-            for n in self.graph.neighbor_of(v):
-                target_degree = degrees[n]
-                # undirected graph
-                edge_pair = (source_degree, target_degree) if source_degree < target_degree else (target_degree, source_degree)
-                if edge_pair not in distribution:
-                    distribution[edge_pair] = 0
-
-                distribution[edge_pair] += 1
-
-        for edge_pair, count in distribution.items():
-            distribution[edge_pair] = float(count) / float(self.graph.get_edge_count())
-        return distribution
-    
-    def compute_degree_connection_prob(self, i, j):
-        ''' 
-        Compute the conditional prob of a i-degree node connecting with a j-degree node
-        (for neutral network)
-        '''
-        qk = float(i * self.compute_degree_prob_distribution()[i]) / float(self.compute_average_degree())
-        edge_pair = (i, j) if i < j else (j, i)
-        edge_prob_distribution = self.compute_edge_prob_distribution()
-        e = edge_prob_distribution[edge_pair] if edge_pair in edge_prob_distribution else 0
-        return float(e) / float(qk)
-    
     def compute_degree_correlation(self):
+        degrees = self.graph.get_degrees()
+        neighbor_count = {}
+        neighbor_degrees = {}
+        for v in self.graph.get_vertices():
+            for w in self.graph.neighbor_of(v):
+                src_degree = degrees[v]
+                if src_degree not in neighbor_count:
+                    neighbor_count[src_degree] = 1
+                else:
+                    neighbor_count[src_degree] += 1
+                if src_degree not in neighbor_degrees:
+                    neighbor_degrees[src_degree] = len(self.graph.neighbor_of(w))
+                else:
+                    neighbor_degrees[src_degree] += len(self.graph.neighbor_of(w))
+
         knn = {} # store the relationship between the degrees of nodes that link to each other.
-        possible_degrees = set(self.graph.get_degrees())
-        for k in possible_degrees:
-            total = 0
-            for k_prime in possible_degrees:
-                total += k_prime * self.compute_degree_connection_prob(k, k_prime)
-            knn[k] = round(total, 5)
+        for k in neighbor_count.keys():
+            knn[k] = float(neighbor_degrees[k]) / float(neighbor_count[k])
+
         self.knn = knn
 
     def compute_local_clustering_coef(self, v):
