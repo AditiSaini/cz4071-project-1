@@ -7,7 +7,7 @@ class GraphAnalyzer:
         self.graph = graph
 
     def compute_average_degree(self):
-        return self.graph.get_edge_count() / self.graph.get_vertex_count()
+        self.avg_degree = self.graph.get_edge_count() / self.graph.get_vertex_count()
 
     def compute_sssp_related_properties(self, sources):
         """
@@ -87,8 +87,7 @@ class GraphAnalyzer:
         for k, count in self.compute_degree_distribution().items():
             distribution[k] = float(count) / self.graph.get_vertex_count()
         self.degree_prob_distribution = distribution
-        return distribution
-
+    
     def compute_degree_correlation(self):
         degrees = self.graph.get_degrees()
         neighbor_count = {}
@@ -114,6 +113,8 @@ class GraphAnalyzer:
     def compute_local_clustering_coef(self, v):
         ''' Compute the local clustering coefficient for v '''
         k = self.graph.get_degrees()[v]
+        if k <= 1:
+            return 1  # todo: to be changed later, set to 0 would be more reasonable
         neighbors = self.graph.neighbor_of(v)
         num_edges_btw_neighbors = 0
         for i in neighbors:
@@ -124,11 +125,29 @@ class GraphAnalyzer:
 
     def compute_avg_clustering_coef(self):
         ''' Compute the overall average clustering coefficient for the network '''
-        local_coef_sum = 0
-        vertex_count = self.graph.get_vertex_count()
-        for i in range(vertex_count):
-            local_coef_sum += self.compute_local_clustering_coef(i)
-        self.avg_clustering_coef = local_coef_sum / float(vertex_count)
+        # local_coef_sum = 0
+        # vertex_count = self.graph.get_vertex_count()
+        # for i in range(vertex_count):
+        #     local_coef_sum += self.compute_local_clustering_coef(i)
+        # self.avg_clustering_coef = float(local_coef_sum) / float(vertex_count)
+        if not hasattr(self, "degree_based_clustering_coef"):
+            self.compute_degree_based_clustering_coef()
+        self.avg_clustering_coef = sum(self.degree_based_clustering_coef.values())/len(self.degree_based_clustering_coef)
+
+    def compute_degree_based_clustering_coef(self):
+        ''' Compute clustering coefficient on a degree-based manner '''
+        degrees = self.graph.get_degrees()
+        coef = {}
+        for v in self.graph.get_vertices():
+            k = degrees[v]
+            if k not in coef:
+                coef[k] = [self.compute_local_clustering_coef(v)]
+            else:
+                coef[k].append(self.compute_local_clustering_coef(v))
+
+        for k in coef.keys():
+            coef[k] = float(sum(coef[k])) / float(len(coef[k]))   
+        self.degree_based_clustering_coef = coef
 
     def comptue_max_degree(self):
         return max(self.graph.get_degrees())
@@ -137,7 +156,8 @@ class GraphAnalyzer:
         if hasattr(self, "degree_prob_distribution"):
             degree_probs = self.degree_prob_distribution
         else:
-            degree_probs = self.compute_degree_prob_distribution()
+            self.compute_degree_prob_distribution()
+            degree_probs = self.degree_prob_distribution
 
         moment = 0
         for k,prob in degree_probs.items():
