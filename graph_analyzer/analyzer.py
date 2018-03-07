@@ -1,5 +1,6 @@
 from __future__ import division
 from collections import deque
+import math
 
 class GraphAnalyzer:
     def __init__(self, graph):
@@ -72,8 +73,7 @@ class GraphAnalyzer:
                 self.total_path_count += 1
         self.close_values[source] = total_length_from_source / total_path_count_from_source
 
-    def degree_distribution(self):
-        ''' get the graph degree distribution '''
+    def compute_degree_distribution(self):
         distribution = {}
         for k in self.graph.get_degrees():
             if k not in distribution:
@@ -81,13 +81,15 @@ class GraphAnalyzer:
             distribution[k] += 1
         return distribution
 
-    def degree_prob_distribution(self):
+    def compute_degree_prob_distribution(self):
+        ''' Compute the graph degree probability distribution '''
         distribution = {}
-        for k, count in self.degree_distribution().items():
+        for k, count in self.compute_degree_distribution().items():
             distribution[k] = float(count) / self.graph.get_vertex_count()
+        self.degree_prob_distribution = distribution
         return distribution
 
-    def edge_prob_distribution(self):
+    def compute_edge_prob_distribution(self):
         distribution = {}
         degrees = self.graph.get_degrees()
         for v in range(self.graph.get_vertex_count()):
@@ -105,26 +107,29 @@ class GraphAnalyzer:
             distribution[edge_pair] = float(count) / float(self.graph.get_edge_count())
         return distribution
     
-    def degree_connection_prob(self, i, j):
-        # the conditional prob of a i-degree node connecting with a j-degree node
-        # for neutral network
-        qk = float(i * self.degree_prob_distribution()[i]) / float(self.compute_average_degree())
+    def compute_degree_connection_prob(self, i, j):
+        ''' 
+        Compute the conditional prob of a i-degree node connecting with a j-degree node
+        (for neutral network)
+        '''
+        qk = float(i * self.compute_degree_prob_distribution()[i]) / float(self.compute_average_degree())
         edge_pair = (i, j) if i < j else (j, i)
-        edge_prob_distribution = self.edge_prob_distribution()
+        edge_prob_distribution = self.compute_edge_prob_distribution()
         e = edge_prob_distribution[edge_pair] if edge_pair in edge_prob_distribution else 0
         return float(e) / float(qk)
     
     def compute_degree_correlation(self):
-        knn = {}
+        knn = {} # store the relationship between the degrees of nodes that link to each other.
         possible_degrees = set(self.graph.get_degrees())
         for k in possible_degrees:
             total = 0
             for k_prime in possible_degrees:
-                total += k_prime * self.degree_connection_prob(k, k_prime)
-            knn[k] = total
+                total += k_prime * self.compute_degree_connection_prob(k, k_prime)
+            knn[k] = round(total, 5)
         self.knn = knn
 
     def compute_local_clustering_coef(self, v):
+        ''' Compute the local clustering coefficient for v '''
         k = self.graph.get_degrees()[v]
         neighbors = self.graph.neighbor_of(v)
         num_edges_btw_neighbors = 0
@@ -135,17 +140,26 @@ class GraphAnalyzer:
         return float(num_edges_btw_neighbors) / float(k*(k-1))
 
     def compute_avg_clustering_coef(self):
+        ''' Compute the overall average clustering coefficient for the network '''
         local_coef_sum = 0
         vertex_count = self.graph.get_vertex_count()
         for i in range(vertex_count):
             local_coef_sum += self.compute_local_clustering_coef(i)
         self.avg_clustering_coef = local_coef_sum / float(vertex_count)
 
-    def compute_closeness(self):
-        return
+    def comptue_max_degree(self):
+        return max(self.graph.get_degrees())
 
-    def compute_distance(self):
-        # small world property
-        return
+    def compute_nth_moment(self, n):
+        if hasattr(self, "degree_prob_distribution"):
+            degree_probs = self.degree_prob_distribution
+        else:
+            degree_probs = self.compute_degree_prob_distribution()
+
+        moment = 0
+        for k,prob in degree_probs.items():
+            moment += math.pow(k, n) * prob
+        return moment
+
     
 
