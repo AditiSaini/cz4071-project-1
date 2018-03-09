@@ -1,4 +1,5 @@
 from __future__ import division
+import time
 from collections import deque
 import math
 
@@ -28,32 +29,38 @@ class GraphAnalyzer:
             sources = self.graph.get_vertices()
         # run
         for source in sources:
+            start_time = time.time()
             self.compute_for_single_source(source)
+            end_time = time.time()
+            print("Time taken for source " + str(source) + " is " + str(end_time - start_time))
         self.avg_path_length = self.total_path_length / self.total_path_count
 
     def compute_for_single_source(self, source):
         """
-        Compute between-ness centrality
+        Compute between-ness centrality, close-ness centrality,
+        and average path length
         """
         # initialization
+        infty = 1000000000
         dependencies = [0.0 for i in self.graph.get_vertices()]
-        distances = [1000000000 for i in self.graph.get_vertices()]
+        distances = [infty for i in self.graph.get_vertices()]
         sigma = [0 for i in self.graph.get_vertices()]
         predecessors = [[] for i in self.graph.get_vertices()]
         q = deque()
         s = []
         # run BFS
         distances[source] = 0
+        sigma[source] = 1
         q.append(source)
         while len(q) != 0:
             v = q.popleft()
             s.append(v)
             for w in self.graph.neighbor_of(v):
-                if distances[w] == 1000000000:
+                if distances[w] == infty:
                     distances[w] = distances[v] + 1
                     q.append(w)
                 if distances[w] == distances[v] + 1:
-                    sigma[w] += 1
+                    sigma[w] += sigma[v]
                     predecessors[w].append(v)
         # compute BC
         while len(s) != 0:
@@ -66,7 +73,7 @@ class GraphAnalyzer:
         total_length_from_source = 0
         total_path_count_from_source = 0
         for dist in distances:
-            if dist != 1000000000 and dist != 0:
+            if dist != infty and dist != 0:
                 total_length_from_source += dist
                 total_path_count_from_source += 1
                 self.total_path_length += dist
@@ -82,7 +89,9 @@ class GraphAnalyzer:
         return distribution
 
     def compute_degree_prob_distribution(self):
-        ''' Compute the graph degree probability distribution '''
+        """
+        Compute the graph degree probability distribution
+        """
         distribution = {}
         for k, count in self.compute_degree_distribution().items():
             distribution[k] = float(count) / self.graph.get_vertex_count()

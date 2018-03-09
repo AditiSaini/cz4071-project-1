@@ -1,5 +1,8 @@
 *.csv
 *.gml
 *.pyc
+*.o
+
+bc
 
 venv/

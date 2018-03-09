@@ -46,10 +46,12 @@ def compute_properties(graph, analyzer, save_dir):
     print("|V|: " + str(graph.get_vertex_count()))
     print("|E|: " + str(graph.get_edge_count()))
     print("Neighbor of vertex 0: " + str(graph.neighbor_of(0)))
-    analyzer.compute_sssp_related_properties([0]) 
+
+    analyzer.compute_sssp_related_properties([]) 
     print("Betweenness: " + str(len(analyzer.bc_values)))
     print("Avg path length: " + str(round(analyzer.avg_path_length, 5)))
     print("Closeness: " + str(len(analyzer.close_values)))
+
     analyzer.compute_degree_correlation()   
     print("Degree correlation: " + str(analyzer.knn.values()[:10]))
     analyzer.compute_degree_based_clustering_coef()
@@ -74,6 +76,9 @@ def compute_properties(graph, analyzer, save_dir):
         pickle.dump(property_info_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print("Usage: python main.py /path/to/graph/file")
+        exit()
     save_dir = "../results"  # the folder for storing the pkl file
     graph = Graph(sys.argv[1])
     analyzer = GraphAnalyzer(graph)
