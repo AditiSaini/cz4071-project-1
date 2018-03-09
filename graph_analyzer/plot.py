@@ -17,5 +17,4 @@ if __name__ == "__main__":
         'width': 0.05,
     }
     nx.draw_random(g, **options)
-    #nx.draw_spring(g, **options)
     plt.show()
