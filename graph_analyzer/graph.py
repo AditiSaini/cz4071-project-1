@@ -17,10 +17,15 @@ class Graph:
         with open(self.graph_file, "r") as input_graph:
             for line in input_graph:
                 self.vertices.append(len(self.edges))
-                destinations = line.split(" ")
-                self.degrees.append(len(destinations))
-                for destination in destinations:
-                    self.edges.append(int(destination))
+                cleaned_line = line.rstrip("\n")
+                # special case: no neighbor
+                if cleaned_line == "":
+                    self.degrees.append(0)
+                else:
+                    destinations = cleaned_line.split(" ")
+                    self.degrees.append(len(destinations))
+                    for destination in destinations:
+                        self.edges.append(int(destination))
         self.vertices.append(len(self.edges))
         # count |V| and |E|
         self.vertex_count = len(self.vertices) - 1
