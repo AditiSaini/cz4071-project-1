@@ -6,39 +6,6 @@ from analyzer import GraphAnalyzer
 import matplotlib.pyplot as plt
 import math
 
-def plot(x, y, x_label, y_label, title, log=False, h_line=None, v_line=None):
-    if log:
-        x = [math.log(i) for i in x]
-        y = [math.log(i) for i in y]
-    plt.scatter(x, y, s=20*0.1)
-    if h_line:
-        if log:
-            h_line = math.log(h_line)
-        plt.axhline(h_line, color='r')
-    if v_line:
-        if log:
-            v_line = math.log(v_line)
-        plt.axvline(v_line, color='r')
-
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-    plt.show()
-
-def draw_properties(save_dir):
-    with open(os.path.join(save_dir, "properties.pkl"), "rb") as f:
-        property_info_dict = pickle.load(f)
-
-    degree_corr = property_info_dict["degree_correlation"]
-    degree_distribution = property_info_dict["degree_distribution"]
-    clustering_coef = property_info_dict["clustering_coef"]
-
-    plot(clustering_coef.keys(), clustering_coef.values(), "k", "Ck", "Clustering Coef", True, 
-            h_line=property_info_dict["avg_clustering_coef"])
-    plot(degree_corr.keys(), degree_corr.values(), "k", "knn", "Degree Correlation", True)
-    plot(degree_distribution.keys(), degree_distribution.values(), "k", "prob", "Degree Distribution", True,
-            v_line=property_info_dict["avg_degree"])
-
 def compute_properties(graph, analyzer, save_dir):
     analyzer.compute_average_degree()
     print("Average degree: " + str(round(analyzer.avg_degree, 5)))
@@ -61,6 +28,7 @@ def compute_properties(graph, analyzer, save_dir):
 
     property_info_dict = {"avg_degree" : analyzer.avg_degree,
                         "degree_distribution" : analyzer.degree_prob_distribution,
+                        "degrees" : graph.get_degrees(),
                         "bc_values" : analyzer.bc_values,
                         "avg_path_len" : analyzer.avg_path_length,
                         "closeness" : analyzer.close_values,

@@ -20,10 +20,10 @@ March 13, 2018; 5 PM
   - [x] N-th moment
 4. [ ] Compare with random network and scale-free networks
 5. [ ] Generate UI (Python Tkinter)
-  - [ ] Betweenness heatmap
-  - [ ] Closeness heatmap
-  - [ ] Degree distribution (tgt. w/ N-th moment)
-  - [ ] Degree correlation
+  - [x] Betweenness heatmap
+  - [x] Closeness heatmap
+  - [x] Degree distribution (tgt. w/ N-th moment)
+  - [x] Degree correlation
   - [ ] BC v.s. closeness plot
   - [ ] Closeness v.s. degree plot
   - [ ] BC v.s. degree plot
