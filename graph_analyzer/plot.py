@@ -1,3 +1,4 @@
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import networkx as nx
@@ -10,6 +11,7 @@ import math
 
 def plot_curve(x, y, x_label, y_label, title, save_as, log=False, h_line=None, v_line=None):
     if log:
+        print(x)
         x = [math.log(i) for i in x]
         y = [math.log(i) for i in y]
     plt.scatter(x, y, s=20*0.1)
@@ -85,22 +87,26 @@ def draw_properties(graph, save_dir):
             log=True,
             v_line=property_info_dict["avg_degree"])
 
-    plot_heatmap(graph, input_file='../cpp_implementation/bc_output.txt', 
+    plot_heatmap(graph, input_file=os.path.join(save_dir, 'bc_output.txt'), 
                 save_as=os.path.join(save_dir, 'betweenness.png'), 
                 title='Between-ness Centrality')
-    plot_heatmap(graph, input_file='../cpp_implementation/close_output.txt', 
+    plot_heatmap(graph, input_file=os.path.join(save_dir, 'close_output.txt'), 
                 save_as=os.path.join(save_dir,'closeness.png'),
                 title='Closeness Centrality')
 
 if __name__ == "__main__":
+    if len(sys.argv) < 4:
+        print("Usage: python plot.py /path/to/graph /path/to/analysis/result <k>")
+        exit()
+    k = int(sys.argv[3])
     plt.rcParams["figure.figsize"] = (11, 7)
     nx_graph = nx.Graph()
-    own_graph = graph.Graph("../datasets/tpch-graph.txt")
+    own_graph = graph.Graph(sys.argv[1])
     degrees = own_graph.get_degrees()
     for v in own_graph.get_vertices():
-        if degrees[v] > 1080: # k = 3
+        if degrees[v] > k:
             for w in own_graph.neighbor_of(v):
                 nx_graph.add_edge(v, w)
-    result_dir = '../results'
+    result_dir = sys.argv[2]
     plot_gragh(nx_graph, result_dir)
     draw_properties(nx_graph, result_dir)

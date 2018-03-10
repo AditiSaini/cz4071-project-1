@@ -20,7 +20,7 @@ def compute_properties(graph, analyzer, save_dir):
     print("Closeness: " + str(len(analyzer.close_values)))
 
     analyzer.compute_degree_correlation()   
-    print("Degree correlation: " + str(analyzer.knn.values()[:10]))
+    print("Degree correlation: " + str(list(analyzer.knn.values())[:10]))
     analyzer.compute_degree_based_clustering_coef()
     analyzer.compute_avg_clustering_coef()    
     print("Avg clustering coef: " + str(analyzer.avg_clustering_coef))
@@ -44,11 +44,10 @@ def compute_properties(graph, analyzer, save_dir):
         pickle.dump(property_info_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print("Usage: python main.py /path/to/graph/file")
+    if len(sys.argv) < 3:
+        print("Usage: python main.py /path/to/graph/file /path/to/result/dir")
         exit()
-    save_dir = "../results"  # the folder for storing the pkl file
+    save_dir = sys.argv[2]  # the folder for storing the pkl file
     graph = Graph(sys.argv[1])
     analyzer = GraphAnalyzer(graph)
     compute_properties(graph, analyzer, save_dir)
-    draw_properties(save_dir)
