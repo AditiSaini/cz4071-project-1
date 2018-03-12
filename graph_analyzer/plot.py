@@ -9,12 +9,14 @@ import os
 import pickle
 import math
 
-def plot_curve(x, y, x_label, y_label, title, save_as, log=False, h_line=None, v_line=None):
+def plot_curve(data, x_label, y_label, title, save_as, log=False, h_line=None, v_line=None):
+    x = data.keys()
+    y = data.values()
     if log:
-        print(x)
-        x = [math.log(i) for i in x]
-        y = [math.log(i) for i in y]
-    plt.scatter(x, y, s=20*0.1)
+        data.pop(0, None)
+        x = [math.log(i) for i in data.keys()]
+        y = [math.log(i) for i in data.values()]
+    plt.scatter(x, y, s=10)
     if h_line:
         if log:
             h_line = math.log(h_line)
@@ -30,15 +32,14 @@ def plot_curve(x, y, x_label, y_label, title, save_as, log=False, h_line=None, v
     plt.savefig(save_as)
     plt.show()
 
-def plot_heatmap(graph, input_file, save_as, title):
+def plot_heatmap(graph, pos, input_file, save_as, title):
     data = pd.read_csv(input_file, names=['value'])
     data.apply(lambda x: ((x - np.mean(x)) / (np.max(x) - np.min(x)))*225)
     data = data.reindex(graph.nodes())
     # Plot it, providing a continuous color scale with cmap:
-    pos = nx.random_layout(graph)
     opts = {
         "node_color":data['value'],
-        'node_size': 0.2,
+        'node_size': 0.7,
         'with_labels': False,
         "pos":pos,
         "cmap":plt.cm.plasma
@@ -57,16 +58,20 @@ def plot_heatmap(graph, input_file, save_as, title):
     plt.show()  
 
 def plot_gragh(graph, save_dir):
+    pos = nx.random_layout(graph)
     options = {
+        'pos': pos,
         'node_color': 'black',
-        'node_size': 0.1,
+        'node_size': 0.7,
         'width': 0.05,
     }
-    nx.draw_random(graph, **options)
-    plt.savefig(os.path.join(save_dir, 'graph.png'))    
+    nx.draw(graph, **options)
+    plt.savefig(os.path.join(save_dir, 'graph.png')) 
+    plt.title("Graph")   
     plt.show()
+    return pos
 
-def draw_properties(graph, save_dir):
+def draw_properties(graph, pos, save_dir):
     with open(os.path.join(save_dir, "properties.pkl"), "rb") as f:
         property_info_dict = pickle.load(f)
 
@@ -75,22 +80,22 @@ def draw_properties(graph, save_dir):
     clustering_coef = property_info_dict["clustering_coef"]
     # degrees = property_info_dict['degrees']
 
-    plot_curve(clustering_coef.keys(), clustering_coef.values(), "k", "Ck", "Clustering Coef", 
+    plot_curve(clustering_coef, "k", "Ck", "Clustering Coefficient", 
             save_as=os.path.join(save_dir, "clustering_coef.png"),
             log=True, 
             h_line=property_info_dict["avg_clustering_coef"])
-    plot_curve(degree_corr.keys(), degree_corr.values(), "k", "knn", "Degree Correlation", 
+    plot_curve(degree_corr, "k", "knn", "Degree Correlation", 
             save_as=os.path.join(save_dir, "degree_corr.png"), 
             log=True)
-    plot_curve(degree_distribution.keys(), degree_distribution.values(), "k", "prob", "Degree Distribution", 
+    plot_curve(degree_distribution, "k", "prob", "Degree Distribution", 
             save_as=os.path.join(save_dir, "degree_distribution.png"),
             log=True,
             v_line=property_info_dict["avg_degree"])
-
-    plot_heatmap(graph, input_file=os.path.join(save_dir, 'bc_output.txt'), 
+    
+    plot_heatmap(graph, pos, input_file=os.path.join(save_dir, 'bc_output.txt'), 
                 save_as=os.path.join(save_dir, 'betweenness.png'), 
                 title='Between-ness Centrality')
-    plot_heatmap(graph, input_file=os.path.join(save_dir, 'close_output.txt'), 
+    plot_heatmap(graph, pos, input_file=os.path.join(save_dir, 'close_output.txt'), 
                 save_as=os.path.join(save_dir,'closeness.png'),
                 title='Closeness Centrality')
 
@@ -108,5 +113,8 @@ if __name__ == "__main__":
             for w in own_graph.neighbor_of(v):
                 nx_graph.add_edge(v, w)
     result_dir = sys.argv[2]
-    plot_gragh(nx_graph, result_dir)
-    draw_properties(nx_graph, result_dir)
+    if nx_graph.nodes():
+        pos = plot_gragh(nx_graph, result_dir)
+        draw_properties(nx_graph, pos, result_dir)
+    else:
+        print("There is no node satisfying your degree threshold.")
