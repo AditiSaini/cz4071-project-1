@@ -1,4 +1,5 @@
 import sys
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import networkx as nx
@@ -10,10 +11,13 @@ import pickle
 import math
 
 def plot_curve(data, x_label, y_label, title, save_as, log=False, h_line=None, v_line=None):
-    x = data.keys()
-    y = data.values()
+    x = list(data.keys())
+    y = list(data.values())
     if log:
-        data.pop(0, None)
+        # Remove zeros for log-log plots
+        for k in x:
+            if k == 0 or data[k] == 0:
+                del data[k]
         x = [math.log(i) for i in data.keys()]
         y = [math.log(i) for i in data.values()]
     plt.scatter(x, y, s=10)
@@ -32,14 +36,20 @@ def plot_curve(data, x_label, y_label, title, save_as, log=False, h_line=None, v
     plt.savefig(save_as)
     plt.show()
 
-def plot_heatmap(graph, pos, input_file, save_as, title):
-    data = pd.read_csv(input_file, names=['value'])
-    data.apply(lambda x: ((x - np.mean(x)) / (np.max(x) - np.min(x)))*225)
-    data = data.reindex(graph.nodes())
+def plot_heatmap(graph, pos, hubs, dataframe, save_as):
+    dataframe.apply(lambda x: ((x - np.mean(x)) / (np.max(x) - np.min(x)))*225)
+    dataframe = dataframe.reindex(graph.nodes())
     # Plot it, providing a continuous color scale with cmap:
+    node_size = []
+    for i in (graph.nodes()):
+        if i not in hubs:
+            node_size.append(0.6)
+        else:
+            # enlarge hubs size
+            node_size.append(5)
     opts = {
-        "node_color":data['value'],
-        'node_size': 0.7,
+        "node_color":dataframe['value'],
+        'node_size': node_size, #0.6, 
         'with_labels': False,
         "pos":pos,
         "cmap":plt.cm.plasma
@@ -47,11 +57,8 @@ def plot_heatmap(graph, pos, input_file, save_as, title):
 
     nodes = nx.draw_networkx_nodes(graph, **opts)
     nodes.set_norm(mcolors.SymLogNorm(linthresh=0.01, linscale=1))
-    
-    # labels = nx.draw_networkx_labels(G, pos)
     edges = nx.draw_networkx_edges(graph, pos, width=0.05)
 
-    plt.title(title)
     plt.colorbar(nodes)
     plt.axis('off')
     plt.savefig(save_as)    
@@ -67,37 +74,72 @@ def plot_gragh(graph, save_dir):
     }
     nx.draw(graph, **options)
     plt.savefig(os.path.join(save_dir, 'graph.png')) 
-    plt.title("Graph")   
     plt.show()
     return pos
 
-def draw_properties(graph, pos, save_dir):
+def draw_properties(graph, pos, hubs, degrees, save_dir):
     with open(os.path.join(save_dir, "properties.pkl"), "rb") as f:
         property_info_dict = pickle.load(f)
 
     degree_corr = property_info_dict["degree_correlation"]
     degree_distribution = property_info_dict["degree_distribution"]
     clustering_coef = property_info_dict["clustering_coef"]
-    # degrees = property_info_dict['degrees']
 
-    plot_curve(clustering_coef, "k", "Ck", "Clustering Coefficient", 
+    plot_curve(clustering_coef, "log(k)", "log(C(k))", "Clustering Coefficient",
             save_as=os.path.join(save_dir, "clustering_coef.png"),
             log=True, 
             h_line=property_info_dict["avg_clustering_coef"])
-    plot_curve(degree_corr, "k", "knn", "Degree Correlation", 
+    plot_curve(degree_corr, "log(k)", "log(knn)", "Degree Correlation", 
             save_as=os.path.join(save_dir, "degree_corr.png"), 
             log=True)
-    plot_curve(degree_distribution, "k", "prob", "Degree Distribution", 
+    plot_curve(degree_distribution, "log(k)", "log(P(k))", "Degree Distribution",
             save_as=os.path.join(save_dir, "degree_distribution.png"),
             log=True,
             v_line=property_info_dict["avg_degree"])
-    
-    plot_heatmap(graph, pos, input_file=os.path.join(save_dir, 'bc_output.txt'), 
-                save_as=os.path.join(save_dir, 'betweenness.png'), 
-                title='Between-ness Centrality')
-    plot_heatmap(graph, pos, input_file=os.path.join(save_dir, 'close_output.txt'), 
-                save_as=os.path.join(save_dir,'closeness.png'),
-                title='Closeness Centrality')
+
+    bc = pd.read_csv(os.path.join(save_dir, 'bc_output.txt'), names=['value'])
+    cc = pd.read_csv(os.path.join(save_dir, 'close_output.txt'), names=['value'])
+    bc_values = bc['value'].tolist()
+    cc_values = cc['value'].tolist()
+    bc_degree = {}
+    cc_degree = {}
+    for i in range(len(degrees)):
+        k = degrees[i]
+        if cc_values[i] > 5000:
+            continue
+        if k not in bc_degree:
+            bc_degree[k] = [bc_values[i]]
+        else:
+            bc_degree[k].append(bc_values[i])
+        if k not in cc_degree:
+            cc_degree[k] = [cc_values[i]]
+        else:
+            cc_degree[k].append(cc_values[i])
+    for k in bc_degree.keys():
+        bc_degree[k] = sum(bc_degree[k])/float(len(bc_degree[k]))
+        cc_degree[k] = sum(cc_degree[k])/float(len(cc_degree[k]))
+
+    plot_curve(bc_degree, "log(k)", "log(bc)", "Betweenness v.s. Degree",
+            log=True,
+            save_as=os.path.join(save_dir, "bc_degree.png"))
+    plot_curve(cc_degree, "log(k)", "log(cc)", "Closeness v.s. Degree",
+            log=True,
+            save_as=os.path.join(save_dir, "cc_degree.png"))
+
+    bc_cc = {}
+    for i in range(len(degrees)):
+        if cc_values[i] > 5000:
+            continue
+        bc_cc[bc_values[i]] = cc_values[i]
+    plot_curve(bc_cc, "log(bc)", "log(cc)", "Betweenness v.s. Closeness",
+            log=True,
+            save_as=(os.path.join(save_dir, "bc_cc.png")))
+
+    plot_heatmap(graph, pos, hubs, bc, 
+                save_as=os.path.join(save_dir, 'betweenness.png'))
+    plot_heatmap(graph, pos, hubs, cc, 
+                save_as=os.path.join(save_dir,'closeness.png'))
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
@@ -108,13 +150,16 @@ if __name__ == "__main__":
     nx_graph = nx.Graph()
     own_graph = graph.Graph(sys.argv[1])
     degrees = own_graph.get_degrees()
+    hubs = []
+    matplotlib.rcParams.update({'font.size': 20})
     for v in own_graph.get_vertices():
         if degrees[v] > k:
+            hubs.append(v)
             for w in own_graph.neighbor_of(v):
                 nx_graph.add_edge(v, w)
     result_dir = sys.argv[2]
     if nx_graph.nodes():
         pos = plot_gragh(nx_graph, result_dir)
-        draw_properties(nx_graph, pos, result_dir)
+        draw_properties(nx_graph, pos, hubs, degrees, result_dir)
     else:
         print("There is no node satisfying your degree threshold.")
