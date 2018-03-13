@@ -36,19 +36,19 @@ def plot_curve(data, x_label, y_label, title, save_as, log=False, h_line=None, v
     plt.savefig(save_as)
     plt.show()
 
-def plot_heatmap(graph, pos, hubs, dataframe, save_as):
-    dataframe.apply(lambda x: ((x - np.mean(x)) / (np.max(x) - np.min(x)))*225)
-    dataframe = dataframe.reindex(graph.nodes())
-    # Plot it, providing a continuous color scale with cmap:
+def plot_heatmap(graph, pos, hubs, data, save_as):
+    mean = np.mean(data)
+    data = [((x - mean) / (max(data) - min(data)))*225 for x in data]
+    # Providing a continuous color scale with cmap
     node_size = []
     for i in (graph.nodes()):
         if i not in hubs:
             node_size.append(0.6)
         else:
-            # enlarge hubs size
+            # enlarge hub size
             node_size.append(5)
     opts = {
-        "node_color":dataframe['value'],
+        "node_color":data,
         'node_size': node_size, #0.6, 
         'with_labels': False,
         "pos":pos,
@@ -97,10 +97,8 @@ def draw_properties(graph, pos, hubs, degrees, save_dir):
             log=True,
             v_line=property_info_dict["avg_degree"])
 
-    bc = pd.read_csv(os.path.join(save_dir, 'bc_output.txt'), names=['value'])
-    cc = pd.read_csv(os.path.join(save_dir, 'close_output.txt'), names=['value'])
-    bc_values = bc['value'].tolist()
-    cc_values = cc['value'].tolist()
+    bc_values = property_info_dict["bc_values"]
+    cc_values = property_info_dict["closeness"]
     bc_degree = {}
     cc_degree = {}
     for i in range(len(degrees)):
@@ -135,9 +133,9 @@ def draw_properties(graph, pos, hubs, degrees, save_dir):
             log=True,
             save_as=(os.path.join(save_dir, "bc_cc.png")))
 
-    plot_heatmap(graph, pos, hubs, bc, 
+    plot_heatmap(graph, pos, hubs, bc_values, 
                 save_as=os.path.join(save_dir, 'betweenness.png'))
-    plot_heatmap(graph, pos, hubs, cc, 
+    plot_heatmap(graph, pos, hubs, cc_values, 
                 save_as=os.path.join(save_dir,'closeness.png'))
 
 
