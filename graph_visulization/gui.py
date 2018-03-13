@@ -82,10 +82,7 @@ if __name__ == "__main__":
     graph_region = Frame(root, width=graph_width, height=graph_height)
     graph_region.grid(row=0, rowspan=3, column=0)
     Label(graph_region, text="Graph").pack()
-    img_ori = Image.open("tpch_graph.png")
-    img_ori = img_ori.resize((graph_width, graph_height), Image.ANTIALIAS)
-    img = ImageTk.PhotoImage(img_ori)
-    graph_canvas = Label(graph_region, image=img, width=graph_width, height=graph_height, borderwidth=2)
+    graph_canvas = Label(graph_region, width=graph_width, height=graph_height, borderwidth=2)
     graph_canvas.pack(side=BOTTOM)
 
     # the plot region
@@ -96,30 +93,21 @@ if __name__ == "__main__":
     plot_region1 = Frame(root, width=plot_width, height=plot_height)
     plot_region1.grid(row=0, column=1)
     Label(plot_region1, text="TPC-H graph property").pack()
-    img_ori2 = Image.open("tpch_graph.png")
-    img_ori2 = img_ori2.resize((plot_width, plot_height), Image.ANTIALIAS)
-    img2 = ImageTk.PhotoImage(img_ori2)
-    plot_canvas1 = Label(plot_region1, image=img2, width=plot_width, height=plot_height)
+    plot_canvas1 = Label(plot_region1, width=plot_width, height=plot_height)
     plot_canvas1.pack(side=BOTTOM)
 
     # plot for random graph
     plot_region2 = Frame(root, width=plot_width, height=plot_height)
     plot_region2.grid(row=1, column=1)
     Label(plot_region2, text="Random graph property").pack()
-    img_ori3 = Image.open("tpch_graph.png")
-    img_ori3 = img_ori3.resize((plot_width, plot_height), Image.ANTIALIAS)
-    img3 = ImageTk.PhotoImage(img_ori3)
-    plot_canvas2 = Label(plot_region2, image=img3, width=plot_width, height=plot_height)
+    plot_canvas2 = Label(plot_region2, width=plot_width, height=plot_height)
     plot_canvas2.pack(side=BOTTOM)
 
     # plot for scale-free graph
     plot_region3 = Frame(root, width=plot_width, height=plot_height)
     plot_region3.grid(row=2, column=1)
     Label(plot_region3, text="Scale-free graph property").pack()
-    img_ori4 = Image.open("tpch_graph.png")
-    img_ori4 = img_ori4.resize((plot_width, plot_height), Image.ANTIALIAS)
-    img4 = ImageTk.PhotoImage(img_ori4)
-    plot_canvas3 = Label(plot_region3, image=img4, width=plot_width, height=plot_height)
+    plot_canvas3 = Label(plot_region3, width=plot_width, height=plot_height)
     plot_canvas3.pack(side=BOTTOM)
 
     # button region

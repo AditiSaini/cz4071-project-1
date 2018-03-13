@@ -14,7 +14,7 @@ def compute_properties(graph, analyzer, save_dir):
     print("|E|: " + str(graph.get_edge_count()))
     print("Neighbor of vertex 0: " + str(graph.neighbor_of(0)))
 
-    analyzer.compute_sssp_related_properties([0]) 
+    analyzer.compute_sssp_related_properties([]) 
     print("Betweenness: " + str(len(analyzer.bc_values)))
     print("Avg path length: " + str(round(analyzer.avg_path_length, 5)))
     print("Closeness: " + str(len(analyzer.close_values)))
