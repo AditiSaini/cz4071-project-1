@@ -71,14 +71,12 @@ class GraphAnalyzer:
                 self.bc_values[v] += dependencies[v]
         # compute closeness and average path length
         total_length_from_source = 0
-        total_path_count_from_source = 0
         for dist in distances:
             if dist != infty and dist != 0:
                 total_length_from_source += dist
-                total_path_count_from_source += 1
                 self.total_path_length += dist
                 self.total_path_count += 1
-        self.close_values[source] = total_length_from_source / total_path_count_from_source
+        self.close_values[source] = (self.graph.get_vertex_coun() - 1) / total_length_from_source
 
     def compute_degree_distribution(self):
         distribution = {}

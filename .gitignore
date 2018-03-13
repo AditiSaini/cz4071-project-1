@@ -6,3 +6,5 @@
 bc
 
 venv/
+
+.DS_Store

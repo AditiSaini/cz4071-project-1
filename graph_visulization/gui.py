@@ -44,11 +44,11 @@ def update_property():
         if prop_str == "d_dist":
             display_image(canvas, os.path.join(base_dir, "degree_distribution.png"), plot_width, plot_height)
         elif prop_str == "bc_close":
-            display_image(canvas, os.path.join(base_dir, "test2.png"), plot_width, plot_height)
+            display_image(canvas, os.path.join(base_dir, "bc_cc.png"), plot_width, plot_height)
         elif prop_str == "close_deg":
-            display_image(canvas, os.path.join(base_dir, "tpch_graph.png"), plot_width, plot_height)
+            display_image(canvas, os.path.join(base_dir, "cc_degree.png"), plot_width, plot_height)
         elif prop_str == "bc_deg":
-            display_image(canvas, os.path.join(base_dir, "tpch_graph.png"), plot_width, plot_height)
+            display_image(canvas, os.path.join(base_dir, "bc_degree.png"), plot_width, plot_height)
         elif prop_str == "d_corr":
             display_image(canvas, os.path.join(base_dir, "degree_corr.png"), plot_width, plot_height)
     print("Updated property to " + prop_str)
