@@ -1,6 +1,7 @@
 from __future__ import division
 from tkinter import *
 from PIL import ImageTk, Image
+import os
 
 APP_NAME = "CZ4071 graph visualization"
 
@@ -18,52 +19,35 @@ def update_graph():
     global graph_canvas, graph_width, graph_height
     graph_str = current_graph.get()
     overlay_str = current_overlay.get()
-    if graph_str == "tpch":
-        if overlay_str == "none":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "bc":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "close":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-    elif graph_str == "random":
-        if overlay_str == "none":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "bc":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "close":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-    elif graph_str == "scale":
-        if overlay_str == "none":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "bc":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-        elif overlay_str == "close":
-            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+    base_dir = os.path.join(result_dir, graph_str)
+    if overlay_str == "none":
+        display_image(graph_canvas, os.path.join(base_dir, "graph.png"), graph_width, graph_height)
+    elif overlay_str == "bc":
+        display_image(graph_canvas, os.path.join(base_dir, "betweenness.png"), graph_width, graph_height)
+    elif overlay_str == "close":
+        display_image(graph_canvas, os.path.join(base_dir, "closeness.png"), graph_width, graph_height)
     print("Updated graph to " + graph_str + " with overlay " + overlay_str)
 
 def update_property():
     global plot_canvas1, plot_canvas2, plot_canvas3, plot_width, plot_height
     prop_str = current_property.get()
-    if prop_str == "d_dist":
-        display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test2.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test.png", plot_width, plot_height)
-    elif prop_str == "bc_close":
-        display_image(plot_canvas1, "test2.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test.png", plot_width, plot_height)
-        display_image(plot_canvas3, "tpch_graph.png", plot_width, plot_height)
-    elif prop_str == "close_deg":
-        display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif prop_str == "bc_deg":
-        display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif prop_str == "d_corr":
-        display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test2.png", plot_width, plot_height)
+    g_with_canvas = [
+        ("tpch", plot_canvas1),
+        ("random", plot_canvas2),
+        ("scale_free", plot_canvas3),
+    ]
+    for g, canvas in g_with_canvas:
+        base_dir = os.path.join(result_dir, g)
+        if prop_str == "d_dist":
+            display_image(canvas, os.path.join(base_dir, "degree_distribution.png"), plot_width, plot_height)
+        elif prop_str == "bc_close":
+            display_image(canvas, os.path.join(base_dir, "test2.png"), plot_width, plot_height)
+        elif prop_str == "close_deg":
+            display_image(canvas, os.path.join(base_dir, "tpch_graph.png"), plot_width, plot_height)
+        elif prop_str == "bc_deg":
+            display_image(canvas, os.path.join(base_dir, "tpch_graph.png"), plot_width, plot_height)
+        elif prop_str == "d_corr":
+            display_image(canvas, os.path.join(base_dir, "degree_corr.png"), plot_width, plot_height)
     print("Updated property to " + prop_str)
 
 def set_property(prop):
@@ -77,6 +61,10 @@ def set_graph(g):
     update_graph()
 
 if __name__ == "__main__":
+    result_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "results")
+    print(result_dir)
     # the app window
     root = Tk()
     root.title(APP_NAME)
@@ -142,7 +130,7 @@ if __name__ == "__main__":
     GRAPHS = [
         ("TPC-H", "tpch"),
         ("Random", "random"),
-        ("Scale-free", "scale")
+        ("Scale-free", "scale_free")
     ]
     current_graph.set("tpch")
     for text, val in GRAPHS:
@@ -172,4 +160,6 @@ if __name__ == "__main__":
     for text, val in PROPERTIES:
         Radiobutton(button_region_2, text=text, variable=current_property, value=val, command=update_property).pack(side=LEFT)
 
+    update_graph()
+    update_property()
     root.mainloop()
