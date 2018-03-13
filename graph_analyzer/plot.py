@@ -37,8 +37,9 @@ def plot_curve(data, x_label, y_label, title, save_as, log=False, h_line=None, v
     plt.show()
 
 def plot_heatmap(graph, pos, hubs, data, save_as):
-    mean = np.mean(data)
-    data = [((x - mean) / (max(data) - min(data)))*225 for x in data]
+    dataframe = pd.DataFrame(data, columns=['value'])
+    dataframe.apply(lambda x: ((x - np.mean(x)) / (np.max(x) - np.min(x)))*225)
+    dataframe = dataframe.reindex(graph.nodes())
     # Providing a continuous color scale with cmap
     node_size = []
     for i in (graph.nodes()):
@@ -48,7 +49,7 @@ def plot_heatmap(graph, pos, hubs, data, save_as):
             # enlarge hub size
             node_size.append(5)
     opts = {
-        "node_color":data,
+        "node_color":dataframe['value'],
         'node_size': node_size, #0.6, 
         'with_labels': False,
         "pos":pos,
