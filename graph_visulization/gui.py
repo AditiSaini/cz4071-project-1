@@ -4,10 +4,6 @@ from PIL import ImageTk, Image
 
 APP_NAME = "CZ4071 graph visualization"
 
-# global properties
-current_graph = "tpch"
-current_property = "d-dist"
-
 def display_image(widget, image_file, width, height):
     """
     Put image into label
@@ -20,46 +16,55 @@ def display_image(widget, image_file, width, height):
 
 def update_graph():
     global graph_canvas, graph_width, graph_height
-    if current_graph == "tpch":
-        display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
-    elif current_graph == "random":
-        display_image(graph_canvas, "test.png", graph_width, graph_height)
-    elif current_graph == "scale":
-        display_image(graph_canvas, "test2.png", graph_width, graph_height)
-    print("Updated graph to " + current_graph)
-
+    graph_str = current_graph.get()
+    overlay_str = current_overlay.get()
+    if graph_str == "tpch":
+        if overlay_str == "none":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "bc":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "close":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+    elif graph_str == "random":
+        if overlay_str == "none":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "bc":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "close":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+    elif graph_str == "scale":
+        if overlay_str == "none":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "bc":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+        elif overlay_str == "close":
+            display_image(graph_canvas, "tpch_graph.png", graph_width, graph_height)
+    print("Updated graph to " + graph_str + " with overlay " + overlay_str)
 
 def update_property():
     global plot_canvas1, plot_canvas2, plot_canvas3, plot_width, plot_height
-    if current_property == "bc":
-        display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas2, "test.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif current_property == "close":
-        display_image(plot_canvas1, "test.png", plot_width, plot_height)
-        display_image(plot_canvas2, "tpch_graph.png", plot_width, plot_height)
-        display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif current_property == "d-dist":
+    prop_str = current_property.get()
+    if prop_str == "d_dist":
         display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
         display_image(plot_canvas2, "test2.png", plot_width, plot_height)
         display_image(plot_canvas3, "test.png", plot_width, plot_height)
-    elif current_property == "bc-close":
+    elif prop_str == "bc_close":
         display_image(plot_canvas1, "test2.png", plot_width, plot_height)
         display_image(plot_canvas2, "test.png", plot_width, plot_height)
         display_image(plot_canvas3, "tpch_graph.png", plot_width, plot_height)
-    elif current_property == "close-d":
+    elif prop_str == "close_deg":
         display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
         display_image(plot_canvas2, "test.png", plot_width, plot_height)
         display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif current_property == "bc-d":
+    elif prop_str == "bc_deg":
         display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
         display_image(plot_canvas2, "test.png", plot_width, plot_height)
         display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    elif current_property == "d-corr":
+    elif prop_str == "d_corr":
         display_image(plot_canvas1, "tpch_graph.png", plot_width, plot_height)
         display_image(plot_canvas2, "test.png", plot_width, plot_height)
         display_image(plot_canvas3, "test2.png", plot_width, plot_height)
-    print("Updated property to " + current_property)
+    print("Updated property to " + prop_str)
 
 def set_property(prop):
     global current_property
@@ -76,13 +81,13 @@ if __name__ == "__main__":
     root = Tk()
     root.title(APP_NAME)
     screen_width = root.winfo_screenwidth() - 50
-    screen_height = root.winfo_screenheight() - 100
+    screen_height = root.winfo_screenheight() - 80
     root.geometry(str(screen_width) + "x" + str(screen_height))
     #root.resizable(width=False, height=False)
 
     # the graph visualization region
     graph_width = int(screen_width * 0.73)
-    graph_height = screen_height - 60
+    graph_height = screen_height - 80
     graph_region = Frame(root, width=graph_width, height=graph_height)
     graph_region.grid(row=0, rowspan=3, column=0)
     Label(graph_region, text="Graph").pack()
@@ -127,21 +132,44 @@ if __name__ == "__main__":
     plot_canvas3.pack(side=BOTTOM)
 
     # button region
-    button_region = Frame(root, width=screen_width, height=60)
-    button_region.grid(row=3, column=0, columnspan=2)
+    button_region_1 = Frame(root, width=screen_width, height=60)
+    button_region_1.grid(row=3, column=0, columnspan=2)
+    current_graph = StringVar()
+    current_overlay = StringVar()
+    current_property = StringVar()
 
-    Label(button_region, text="Choose graph:").pack(side=LEFT)
-    Button(button_region, text="TPC-H", command=(lambda: set_graph("tpch"))).pack(side=LEFT)
-    Button(button_region, text="Random", command=(lambda: set_graph("random"))).pack(side=LEFT)
-    Button(button_region, text="Scale-free", command=(lambda: set_graph("scale"))).pack(side=LEFT)
+    Label(button_region_1, text="Choose graph:").pack(side=LEFT)
+    GRAPHS = [
+        ("TPC-H", "tpch"),
+        ("Random", "random"),
+        ("Scale-free", "scale")
+    ]
+    current_graph.set("tpch")
+    for text, val in GRAPHS:
+        Radiobutton(button_region_1, text=text, variable=current_graph, value=val, command=update_graph).pack(side=LEFT)
 
-    Label(button_region, text="Choose property:").pack(side=LEFT)
-    Button(button_region, text="Betweenness (BC)", command=(lambda: set_property("bc"))).pack(side=LEFT)
-    Button(button_region, text="Closeness", command=(lambda: set_property("close"))).pack(side=LEFT)
-    Button(button_region, text="Degree dist.", command=(lambda: set_property("d-dist"))).pack(side=LEFT)
-    Button(button_region, text="BC v.s. Closeness", command=(lambda: set_property("bc-close"))).pack(side=LEFT)
-    Button(button_region, text="BC v.s. Degree", command=(lambda: set_property("bc-d"))).pack(side=LEFT)
-    Button(button_region, text="Closeness v.s. Degree", command=(lambda: set_property("close-d"))).pack(side=LEFT)
-    Button(button_region, text="Degree correlation", command=(lambda: set_property("d-corr"))).pack(side=LEFT)
+    Label(button_region_1, text="Choose overlay:").pack(side=LEFT, padx=(20, 0))
+    OVERLAYS = [
+        ("None", "none"),
+        ("Betweenness centrality (BC)", "bc"),
+        ("Closeness centrality", "close")
+    ]
+    current_overlay.set("none")
+    for text, val in OVERLAYS:
+        Radiobutton(button_region_1, text=text, variable=current_overlay, value=val, command=update_graph).pack(side=LEFT)
+
+    button_region_2 = Frame(root, width=screen_width, height=60)
+    button_region_2.grid(row=4, column=0, columnspan=2)
+    Label(button_region_2, text="Choose property:").pack(side=LEFT)
+    PROPERTIES = [
+        ("Degree Distribution", "d_dist"),
+        ("Degree Correlation", "d_corr"),
+        ("Degree BC v.s. Closeness", "bc_close"),
+        ("Degree BC v.s. Degree", "bc_deg"),
+        ("Degree Close v.s. Degree", "close_deg"),
+    ]
+    current_property.set("d_dist")
+    for text, val in PROPERTIES:
+        Radiobutton(button_region_2, text=text, variable=current_property, value=val, command=update_property).pack(side=LEFT)
 
     root.mainloop()
