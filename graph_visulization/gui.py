@@ -1,5 +1,8 @@
 from __future__ import division
-from tkinter import *
+try:
+    from Tkinter import *
+except ImportError:
+    from tkinter import *
 from PIL import ImageTk, Image
 import os
 
