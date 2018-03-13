@@ -34,6 +34,8 @@ class GraphAnalyzer:
             end_time = time.time()
             print("Time taken for source " + str(source) + " is " + str(end_time - start_time))
         self.avg_path_length = self.total_path_length / self.total_path_count
+        for i in range(len(self.bc_values)):
+            self.bc_values[i] = self.bc_values[i] / ((self.graph.get_vertex_count() - 1) * (self.graph.get_vertex_count() - 2))
 
     def compute_for_single_source(self, source):
         """
